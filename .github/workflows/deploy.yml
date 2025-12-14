@@ -100,11 +100,11 @@ jobs:
               sudo apt install -y awscli
             fi
 
-            DOCKER_COMPOSE_VERSION="2.20.2"
-            sudo rm -f /usr/local/bin/docker-compose
-            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-            docker-compose --version
+            # DOCKER_COMPOSE_VERSION="2.20.2"
+            # sudo rm -f /usr/local/bin/docker-compose
+            # sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            # sudo chmod +x /usr/local/bin/docker-compose
+            # docker-compose --version
 
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
 
@@ -116,6 +116,13 @@ jobs:
               cd test4
             fi
 
-            docker-compose down
-            docker-compose up -d --force-recreate
+            # docker-compose down
+            # docker-compose up -d --force-recreate
+
+            docker run -d \
+            --name ${CONTAINER_NAME} \
+            -p 8080:8080 \
+            --restart unless-stopped \
+            ${IMAGE_NAME}
+            
           EOF
