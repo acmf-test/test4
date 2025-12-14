@@ -140,21 +140,20 @@ jobs:
               PROJECT_DB_USER=test4_user
               PROJECT_DB_PASS=test4_pass
 
-              docker exec postgres psql -U platform_admin -d postgres <<'SQL'
-              DO $do$
-              BEGIN
-              IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'test4') THEN
-              CREATE DATABASE test4;
-              END IF;
+              docker exec postgres psql -U platform_admin -d postgres -tAc \
+              "SELECT 1 FROM pg_database WHERE datname='${PROJECT_DB}'" \
+              | grep -q 1 || docker exec postgres psql -U platform_admin -d postgres -c \
+              "CREATE DATABASE ${PROJECT_DB};"
               
-              IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'test4_user') THEN
-              CREATE USER test4_user WITH PASSWORD 'test4_pass';
-              END IF;
+              # Create user if it does not exist
+              docker exec postgres psql -U platform_admin -d postgres -tAc \
+              "SELECT 1 FROM pg_roles WHERE rolname='${PROJECT_DB_USER}'" \
+              | grep -q 1 || docker exec postgres psql -U platform_admin -d postgres -c \
+              "CREATE USER ${PROJECT_DB_USER} WITH PASSWORD '${PROJECT_DB_PASS}';"
               
-              GRANT ALL PRIVILEGES ON DATABASE test4 TO test4_user;
-              END
-              $do$;
-              SQL
+              # Grant privileges (safe to re-run)
+              docker exec postgres psql -U platform_admin -d postgres -c \
+              "GRANT ALL PRIVILEGES ON DATABASE ${PROJECT_DB} TO ${PROJECT_DB_USER};"
 
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
 
