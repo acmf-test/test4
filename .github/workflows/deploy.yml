@@ -154,7 +154,7 @@ jobs:
                GRANT ALL PRIVILEGES ON DATABASE test4 TO test4_user;
              END
             $do$;
-            SQL
+            'SQL'
 
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
 
