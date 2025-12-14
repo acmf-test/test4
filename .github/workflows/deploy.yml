@@ -117,11 +117,17 @@ jobs:
               -v pgdata:/var/lib/postgresql/data \
               postgres:17
 
+              # Wait for Postgres to be ready
+              until docker exec postgres pg_isready -U platform_admin >/dev/null 2>&1; do
+                echo "Waiting for Postgres..."
+                sleep 2
+              done
+              
               PROJECT_DB=test4
               PROJECT_DB_USER=test4_user
               PROJECT_DB_PASS=test4_pass
 
-              docker exec postgres psql -U platform_admin -d postgres<<EOSQL
+              docker exec -it postgres psql -U platform_admin -d postgres<<EOSQL
               DO
               \$do\$
               BEGIN
