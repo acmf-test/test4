@@ -121,7 +121,7 @@ jobs:
               PROJECT_DB_USER=test4_user
               PROJECT_DB_PASS=test4_pass
 
-              docker exec postgres psql -U platform_admin <<EOSQL
+              docker exec postgres psql -U platform_admin -d postgres<<EOSQL
               DO
               \$do\$
               BEGIN
