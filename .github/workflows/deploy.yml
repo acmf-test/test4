@@ -140,7 +140,7 @@ jobs:
               PROJECT_DB_USER=test4_user
               PROJECT_DB_PASS=test4_pass
 
-              docker exec postgres psql -U platform_admin -d postgres -c "
+              docker exec postgres psql -U platform_admin -d postgres <<'SQL'
               DO $do$
               BEGIN
                 IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'test4') THEN
@@ -154,7 +154,7 @@ jobs:
                GRANT ALL PRIVILEGES ON DATABASE test4 TO test4_user;
              END
             $do$;
-            "
+            SQL
 
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
 
