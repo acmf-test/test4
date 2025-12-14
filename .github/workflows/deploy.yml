@@ -106,6 +106,37 @@ jobs:
             # sudo chmod +x /usr/local/bin/docker-compose
             # docker-compose --version
 
+            docker network inspect app-network >/dev/null 2>&1 || docker network create app-network
+            docker ps | grep postgres || docker run -d \
+              --name postgres \
+              --network app-network \
+              -e POSTGRES_USER=platform_admin \
+              -e POSTGRES_PASSWORD=strongpassword \
+              -p 5432:5432 \
+              -v pgdata:/var/lib/postgresql/data \
+              postgres:17
+
+              PROJECT_DB=test4
+              PROJECT_DB_USER=test4_user
+              PROJECT_DB_PASS=test4_pass
+
+              docker exec postgres psql -U platform_admin <<EOSQL
+              DO
+              \$do\$
+              BEGIN
+                IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '$PROJECT_DB') THEN
+                  CREATE DATABASE $PROJECT_DB;
+               END IF;
+
+               IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$PROJECT_DB_USER') THEN
+                  CREATE USER $PROJECT_DB_USER WITH PASSWORD '$PROJECT_DB_PASS';
+               END IF;
+
+               GRANT ALL PRIVILEGES ON DATABASE $PROJECT_DB TO $PROJECT_DB_USER;
+             END
+            \$do\$;
+            EOSQL
+
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
 
             if [ -d "test4/.git" ]; then
@@ -125,6 +156,9 @@ jobs:
             --restart unless-stopped \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e SPRING_CLOUD_CONFIG_ENABLED=false \
+            -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/test4 \
+            -e SPRING_DATASOURCE_USERNAME=test4_user \
+            -e SPRING_DATASOURCE_PASSWORD=test4_pass \
             public.ecr.aws/c4d3l3m6/test4:latest
             
           EOF
