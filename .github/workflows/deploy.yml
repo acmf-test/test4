@@ -123,6 +123,8 @@ jobs:
             --name test4 \
             -p 8080:8080 \
             --restart unless-stopped \
+            -e SPRING_PROFILES_ACTIVE=prod \
+            -e SPRING_CLOUD_CONFIG_ENABLED=false \
             public.ecr.aws/c4d3l3m6/test4:latest
             
           EOF
