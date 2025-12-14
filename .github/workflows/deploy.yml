@@ -88,6 +88,7 @@ jobs:
           chmod 600 ~/.ssh/ec2-keypair.pem
           ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-keypair.pem ec2-user@${{ secrets.EC2_IP }} <<EOF
+          set -e
 
             sudo dnf update -y
             sudo dnf install -y docker git
@@ -106,24 +107,33 @@ jobs:
             # sudo chmod +x /usr/local/bin/docker-compose
             # docker-compose --version
 
-            docker network inspect app-network >/dev/null 2>&1 || docker network create app-network
-            docker ps | grep postgres || docker run -d \
-              --name postgres \
-              --network app-network \
-              -e POSTGRES_USER=platform_admin \
-              -e POSTGRES_PASSWORD=strongpassword \
-              -e POSTGRES_DB=postgres \
-              -p 5432:5432 \
-              -v pgdata:/var/lib/postgresql/data \
-              postgres:17
+            # docker network inspect app-network >/dev/null 2>&1 || docker network create app-network
+            # docker ps | grep postgres || docker run -d \
+            #   --name postgres \
+            #   --network app-network \
+            #   -e POSTGRES_USER=platform_admin \
+            #   -e POSTGRES_PASSWORD=strongpassword \
+            #   -e POSTGRES_DB=postgres \
+            #   -p 5432:5432 \
+            #   -v pgdata:/var/lib/postgresql/data \
+            #   postgres:17
+            if ! docker ps | grep -q postgres; then
+              docker run -d \
+                --name postgres \
+                --network app-network \
+                -e POSTGRES_USER=platform_admin \
+                -e POSTGRES_PASSWORD=strongpassword \
+                -e POSTGRES_DB=postgres \
+                -p 5432:5432 \
+                -v pgdata:/var/lib/postgresql/data \
+                postgres:17
+            fi
 
               # Wait for Postgres to be ready
               until docker exec postgres pg_isready -U platform_admin >/dev/null 2>&1; do
                 echo "Waiting for Postgres..."
                 sleep 2
               done
-
-              set -e
               
               PROJECT_DB=test4
               PROJECT_DB_USER=test4_user
@@ -148,6 +158,8 @@ jobs:
 
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
 
+            docker rm -f test4 || true
+
             if [ -d "test4/.git" ]; then
               cd test4
               git pull origin main
@@ -161,6 +173,7 @@ jobs:
 
             docker run -d \
             --name test4 \
+            --network app-network \
             -p 8080:8080 \
             --restart unless-stopped \
             -e SPRING_PROFILES_ACTIVE=prod \
