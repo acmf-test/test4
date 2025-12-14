@@ -122,12 +122,14 @@ jobs:
                 echo "Waiting for Postgres..."
                 sleep 2
               done
+
+              set -e
               
               PROJECT_DB=test4
               PROJECT_DB_USER=test4_user
               PROJECT_DB_PASS=test4_pass
 
-              docker exec -it postgres psql -U platform_admin -d postgres<<EOSQL
+              docker exec postgres psql -U platform_admin -d postgres <<EOSQL
               DO
               \$do\$
               BEGIN
