@@ -140,7 +140,7 @@ jobs:
               PROJECT_DB_USER=test4_user
               PROJECT_DB_PASS=test4_pass
 
-              docker exec postgres psql -U platform_admin -d postgres <<'EOSQL'
+              docker exec postgres psql -U platform_admin -d postgres -c "
               DO
               \$do\$
               BEGIN
@@ -155,7 +155,7 @@ jobs:
                GRANT ALL PRIVILEGES ON DATABASE $PROJECT_DB TO $PROJECT_DB_USER;
              END
             \$do\$;
-            EOSQL
+            "
 
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
 
