@@ -143,15 +143,15 @@ jobs:
               docker exec postgres psql -U platform_admin -d postgres <<'SQL'
               DO $do$
               BEGIN
-                IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'test4') THEN
-                  CREATE DATABASE $PROJECT_DB;
-               END IF;
-
-               IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'test4_user') THEN
-                  CREATE USER $PROJECT_DB_USER WITH PASSWORD 'test4_pass';
-               END IF;
-
-               GRANT ALL PRIVILEGES ON DATABASE test4 TO test4_user;
+              IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'test4') THEN
+              CREATE DATABASE $PROJECT_DB;
+              END IF;
+              
+              IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'test4_user') THEN
+              CREATE USER $PROJECT_DB_USER WITH PASSWORD 'test4_pass';
+              END IF;
+              
+              GRANT ALL PRIVILEGES ON DATABASE test4 TO test4_user;
               END
               $do$;
               SQL
