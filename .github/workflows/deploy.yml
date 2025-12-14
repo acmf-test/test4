@@ -107,7 +107,8 @@ jobs:
             # sudo chmod +x /usr/local/bin/docker-compose
             # docker-compose --version
 
-            # docker network inspect app-network >/dev/null 2>&1 || docker network create app-network
+            docker network inspect app-network >/dev/null 2>&1 || docker network create app-network
+            
             # docker ps | grep postgres || docker run -d \
             #   --name postgres \
             #   --network app-network \
@@ -139,7 +140,7 @@ jobs:
               PROJECT_DB_USER=test4_user
               PROJECT_DB_PASS=test4_pass
 
-              docker exec postgres psql -U platform_admin -d postgres <<EOSQL
+              docker exec postgres psql -U platform_admin -d postgres <<'EOSQL'
               DO
               \$do\$
               BEGIN
