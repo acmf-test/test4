@@ -158,8 +158,8 @@ jobs:
               docker exec postgres psql -U platform_admin -d postgres -c \
               "GRANT ALL PRIVILEGES ON DATABASE test4 TO test4_user;"
 
-              docker exec postgres psql -U platform_admin -d ${PROJECT_DB} -c \
-              "ALTER SCHEMA public OWNER TO ${PROJECT_DB_USER};"
+              docker exec postgres psql -U platform_admin -d test4 -c \
+              "ALTER SCHEMA public OWNER TO test4_user;"
 
 
             docker pull public.ecr.aws/c4d3l3m6/test4:latest
