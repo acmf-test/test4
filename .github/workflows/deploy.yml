@@ -144,11 +144,11 @@ jobs:
               DO $do$
               BEGIN
               IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'test4') THEN
-              CREATE DATABASE $PROJECT_DB;
+              CREATE DATABASE test4;
               END IF;
               
               IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'test4_user') THEN
-              CREATE USER $PROJECT_DB_USER WITH PASSWORD 'test4_pass';
+              CREATE USER test4_user WITH PASSWORD 'test4_pass';
               END IF;
               
               GRANT ALL PRIVILEGES ON DATABASE test4 TO test4_user;
